@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetBird Monitor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #242424;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --accent: #00d4aa;
+            --accent-hover: #00f5c4;
+            --danger: #ff4757;
+            --success: #2ed573;
+            --warning: #ffa502;
+            --border: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            padding: 3rem 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), #00a8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .tagline {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 1.25rem;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        .peers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .peer-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .peer-card.status-up {
+            border-left: 4px solid var(--success);
+        }
+
+        .peer-card.status-down {
+            border-left: 4px solid var(--danger);
+        }
+
+        .peer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .peer-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .status-badge.up {
+            background: rgba(46, 213, 115, 0.15);
+            color: var(--success);
+        }
+
+        .status-badge.down {
+            background: rgba(255, 71, 87, 0.15);
+            color: var(--danger);
+        }
+
+        .peer-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .peer-details span {
+            word-break: break-all;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        .status-dot.up {
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+        }
+
+        .status-dot.down {
+            background: var(--danger);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .events-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            overflow: hidden;
+        }
+
+        .events-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .events-table th,
+        .events-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .events-table th {
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .events-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .events-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .logo {
+                font-size: 2rem;
+            }
+
+            .peers-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .events-table {
+                font-size: 0.875rem;
+            }
+
+            .events-table th,
+            .events-table td {
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">NetBird Monitor</div>
+            <p class="tagline">Мониторинг пиров NetBird с уведомлениями в Gotify</p>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="total-peers">6</div>
+                <div class="stat-label">Всего пиров</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="online-peers" style="color: var(--success);">5</div>
+                <div class="stat-label">Онлайн</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="offline-peers" style="color: var(--danger);">1</div>
+                <div class="stat-label">Офлайн</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="check-interval">30</div>
+                <div class="stat-label">Интервал (сек)</div>
+            </div>
+        </div>
+
+        <section>
+            <h2 class="section-title">Пиры</h2>
+            <div class="peers-grid" id="peers-grid">
+                <div class="peer-card status-up">
+                    <div class="peer-header">
+                        <span class="peer-name">beelink</span>
+                        <span class="status-badge up">Online</span>
+                    </div>
+                    <div class="peer-details">
+                        <span><span class="status-dot up"></span>Connected</span>
+                    </div>
+                </div>
+                <div class="peer-card status-up">
+                    <div class="peer-header">
+                        <span class="peer-name">intelnuc</span>
+                        <span class="status-badge up">Online</span>
+                    </div>
+                    <div class="peer-details">
+                        <span><span class="status-dot up"></span>Connected</span>
+                    </div>
+                </div>
+                <div class="peer-card status-down">
+                    <div class="peer-header">
+                        <span class="peer-name">kompukter</span>
+                        <span class="status-badge down">Offline</span>
+                    </div>
+                    <div class="peer-details">
+                        <span><span class="status-dot down"></span>Connecting</span>
+                    </div>
+                </div>
+                <div class="peer-card status-up">
+                    <div class="peer-header">
+                        <span class="peer-name">redmenote</span>
+                        <span class="status-badge up">Online</span>
+                    </div>
+                    <div class="peer-details">
+                        <span><span class="status-dot up"></span>Connected</span>
+                    </div>
+                </div>
+                <div class="peer-card status-up">
+                    <div class="peer-header">
+                        <span class="peer-name">server</span>
+                        <span class="status-badge up">Online</span>
+                    </div>
+                    <div class="peer-details">
+                        <span><span class="status-dot up"></span>Connected</span>
+                    </div>
+                </div>
+                <div class="peer-card status-up">
+                    <div class="peer-header">
+                        <span class="peer-name">vivovegas</span>
+                        <span class="status-badge up">Online</span>
+                    </div>
+                    <div class="peer-details">
+                        <span><span class="status-dot up"></span>Connected</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">Последние события</h2>
+            <div class="events-section">
+                <table class="events-table">
+                    <thead>
+                        <tr>
+                            <th>Пир</th>
+                            <th>Событие</th>
+                            <th>Время</th>
+                        </tr>
+                    </thead>
+                    <tbody id="events-body">
+                        <tr>
+                            <td>vivovegas</td>
+                            <td><span class="status-badge up">Подключился</span></td>
+                            <td>26.03.2026 23:22</td>
+                        </tr>
+                        <tr>
+                            <td>redmenote</td>
+                            <td><span class="status-badge up">Подключился</span></td>
+                            <td>26.03.2026 23:21</td>
+                        </tr>
+                        <tr>
+                            <td>server</td>
+                            <td><span class="status-badge up">Подключился</span></td>
+                            <td>26.03.2026 23:20</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>NetBird Monitor - <a href="https://github.com/yanik-v86/netbird-monitor">GitHub</a></p>
+        </footer>
+    </div>
+</body>
+</html>
