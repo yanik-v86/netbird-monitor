@@ -1,0 +1,6 @@
+# Environment file with secrets
+.env
+
+# Data directory
+data/
+logs/

@@ -1,0 +1,22 @@
+[Unit]
+Description=NetBird Peer Monitor with Gotify Notifications
+After=network.target netbird.service
+Wants=netbird.service
+
+[Service]
+Type=simple
+User=%U
+Group=%G
+WorkingDirectory=/home/docker/netbird-monitor
+ExecStart=/bin/bash /home/docker/netbird-monitor/monitor.sh
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=netbird-monitor
+
+# Environment
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+[Install]
+WantedBy=multi-user.target
